@@ -189,7 +189,7 @@ def reddit_comment_thread(main_comment, replies=None, username="u/ResumeDestroye
 def main():
     theme = set_theme()
     inject_theme_css(theme)
-    st.markdown('<div class="main-header" style="color:#ff1744;text-shadow:0 0 24px #6a0572;">Resume Destroyer 🔥</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-header" style="color:#ff1744;text-shadow:0 0 24px #6a0572;">🔥Resume Destroyer🔥</div>', unsafe_allow_html=True)
     st.caption('Upload your resume and prepare for total annihilation!')
     client = get_groq_client()
     st.divider()
