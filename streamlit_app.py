@@ -13,6 +13,38 @@ try:
 except ImportError:
     pass
 
+# --- THEME TOGGLE ---
+def set_theme():
+    if 'theme' not in st.session_state:
+        st.session_state.theme = 'dark'
+    theme = st.sidebar.radio('Theme', ['Dark', 'Light'], index=0 if st.session_state.theme=='dark' else 1)
+    st.session_state.theme = theme.lower()
+    return st.session_state.theme
+
+def inject_theme_css(theme):
+    if theme == 'dark':
+        st.markdown('''<style>
+            body, .stApp { background: #18181b !important; color: #e0e0e0 !important; }
+            .stButton > button { background: #22223b; color: #fff; border-radius: 8px; font-weight: 700; border: none; padding: 0.75rem 2rem; margin: 0.5rem 0; }
+            .stButton > button:hover { background: #3a3a5a; color: #fff; }
+            .stTextArea textarea, .stFileUploader, .stTextInput input { background: #232336 !important; color: #e0e0e0 !important; border-radius: 8px !important; border: 1px solid #333 !important; }
+            .stTextArea textarea:focus, .stTextInput input:focus { border: 1.5px solid #6366f1 !important; }
+            .stAlert, .stInfo, .stSuccess, .stError, .stWarning { border-radius: 8px !important; }
+            .stTabs [data-baseweb="tab"] { background: #232336 !important; color: #e0e0e0 !important; border-radius: 8px 8px 0 0 !important; }
+            .stTabs [aria-selected="true"] { background: #6366f1 !important; color: #fff !important; }
+        </style>''', unsafe_allow_html=True)
+    else:
+        st.markdown('''<style>
+            body, .stApp { background: #f7f7fa !important; color: #22223b !important; }
+            .stButton > button { background: #e0e0e0; color: #22223b; border-radius: 8px; font-weight: 700; border: none; padding: 0.75rem 2rem; margin: 0.5rem 0; }
+            .stButton > button:hover { background: #6366f1; color: #fff; }
+            .stTextArea textarea, .stFileUploader, .stTextInput input { background: #fff !important; color: #22223b !important; border-radius: 8px !important; border: 1px solid #bbb !important; }
+            .stTextArea textarea:focus, .stTextInput input:focus { border: 1.5px solid #6366f1 !important; }
+            .stAlert, .stInfo, .stSuccess, .stError, .stWarning { border-radius: 8px !important; }
+            .stTabs [data-baseweb="tab"] { background: #e0e0e0 !important; color: #22223b !important; border-radius: 8px 8px 0 0 !important; }
+            .stTabs [aria-selected="true"] { background: #6366f1 !important; color: #fff !important; }
+        </style>''', unsafe_allow_html=True)
+
 # Page config
 st.set_page_config(
     page_title="Resume Destroyer 🔥",
@@ -30,22 +62,13 @@ st.set_page_config(
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
-    .stApp { background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 25%, #0d1421 50%, #1a1a1a 75%, #0c0c0c 100%) !important; background-attachment: fixed !important; color: #e0e0e0 !important; }
-    * { color: #e0e0e0 !important; }
-    .main .block-container { background: rgba(13, 20, 33, 0.7); backdrop-filter: blur(10px); border-radius: 20px; padding: 2rem; margin-top: 1rem; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); }
     .main-header { font-family: 'Orbitron', sans-serif; font-size: 4.8rem; font-weight: 900; text-align: center; color: #e0e0e0; margin-bottom: 1rem; letter-spacing: 4px; text-transform: uppercase; text-shadow: 0 0 20px rgba(255, 23, 68, 0.8); }
     .subtitle { font-family: 'Inter', sans-serif; font-size: 1.8rem; text-align: center; color: #e0e0e0; margin-bottom: 3rem; font-weight: 300; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7); }
-    .stButton > button { background: linear-gradient(45deg, #FF1744, #D50000, #8B0000, #B71C1C) !important; color: white !important; border: none !important; padding: 1.5rem 3rem !important; border-radius: 50px !important; font-weight: 900 !important; font-size: 1.2rem !important; font-family: 'Orbitron', sans-serif !important; text-transform: uppercase !important; letter-spacing: 2px !important; box-shadow: 0 10px 30px rgba(255, 23, 68, 0.4) !important; transition: all 0.3s ease !important; width: 100% !important; margin: 1rem 0 !important; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important; }
-    .stButton > button:hover { transform: translateY(-3px) scale(1.05) !important; box-shadow: 0 15px 40px rgba(255, 23, 68, 0.6) !important; filter: brightness(1.2) !important; }
     .processing-indicator { display: inline-flex; align-items: center; gap: 8px; font-family: 'Inter', sans-serif; font-weight: 500; margin-bottom: 1rem; }
     .speed-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
     .speed-fast { background: linear-gradient(45deg, #4CAF50, #8BC34A); color: white; box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3); }
     .speed-normal { background: linear-gradient(45deg, #FF9800, #FFC107); color: white; box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3); }
     .speed-slow { background: linear-gradient(45deg, #F44336, #E91E63); color: white; box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3); }
-    .stFileUploader { background: linear-gradient(135deg, #1a1a2e, #16213e); border: 2px dashed rgba(255, 23, 68, 0.3); border-radius: 20px; padding: 2rem; text-align: center; transition: all 0.3s ease; }
-    .stFileUploader:hover { border-color: rgba(255, 23, 68, 0.8); background: linear-gradient(135deg, #2a2a3e, #1e2a3e); }
-    .stTextArea > div > div > textarea { background: linear-gradient(135deg, #1a1a2e, #16213e) !important; border: 2px solid rgba(255, 255, 255, 0.1) !important; border-radius: 15px !important; padding: 1.5rem !important; font-family: 'Inter', sans-serif !important; color: #e0e0e0 !important; font-size: 1rem !important; line-height: 1.6 !important; }
-    .stTextArea > div > div > textarea:focus { border-color: rgba(255, 23, 68, 0.8) !important; box-shadow: 0 0 0 3px rgba(255, 23, 68, 0.1) !important; }
     .roast-container { background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 20%, #16213e 40%, #2c1810 60%, #533483 80%, #6A0572 100%); padding: 3rem; border-radius: 25px; margin: 2rem 0; color: #ffffff; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 100px rgba(156, 39, 176, 0.3); border: 3px solid; border-image: linear-gradient(45deg, #9C27B0, #673AB7, #3F51B5, #2196F3, #9C27B0) 1; }
     .roast-container h3 { font-family: 'Orbitron', sans-serif; font-size: 2.4rem; font-weight: 700; margin-bottom: 2rem; text-align: center; color: #ffffff !important; letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 20px rgba(156, 39, 176, 0.8); }
     .roast-container p { font-size: 1.15rem; line-height: 1.7; font-family: 'Inter', sans-serif; color: #ffffff !important; }
@@ -140,157 +163,90 @@ def generate_roast(client, resume_text, roast_type):
         return ""
 
 def main():
-    if 'resume_text' not in st.session_state:
-        st.session_state.resume_text = ""
-    if 'roast_type' not in st.session_state:
-        st.session_state.roast_type = None
-    st.markdown('<div class="main-header">🔥 RESUME DESTROYER 🔥</div>', unsafe_allow_html=True)
-    st.markdown('<div class="subtitle">Upload your resume and prepare for total annihilation 💀⚡</div>', unsafe_allow_html=True)
+    theme = set_theme()
+    inject_theme_css(theme)
+    st.title('🔥 Resume Destroyer')
+    st.caption('Upload your resume and prepare for total annihilation!')
     client = get_groq_client()
-    st.markdown("### 📄 Upload Your Resume")
-    st.markdown("Choose your preferred method to upload your resume:")
-    tab1, tab2, tab3 = st.tabs(["📝 Text Input", "📄 PDF Upload", "🖼️ Image Upload"])
+    st.divider()
+    st.subheader('Upload Your Resume')
+    tab1, tab2, tab3 = st.tabs(["Text Input", "PDF Upload", "Image Upload"])
     with tab1:
-        st.markdown("""
-        <div class="processing-indicator">
-        📝 <strong>Text Input</strong> 
-        <span class="speed-badge speed-fast">⚡ INSTANT</span>
-        </div>
-        """, unsafe_allow_html=True)
-        st.markdown("**Copy and paste your resume text:**")
         text_input = st.text_area(
-            "Resume text:",
-            value=st.session_state.resume_text,
-            height=300,
-            placeholder="Copy and paste your resume text here for complete destruction...",
-            label_visibility="collapsed",
+            "Paste your resume text here:",
+            value=st.session_state.get('resume_text', ''),
+            height=200,
             key="text_input_area"
         )
-        if text_input != st.session_state.resume_text:
+        if text_input != st.session_state.get('resume_text', ''):
             st.session_state.resume_text = text_input.strip()
-            if st.session_state.resume_text:
-                st.success("✅ Resume text loaded successfully!")
     with tab2:
-        st.markdown("""
-        <div class="processing-indicator">
-        📄 <strong>PDF Upload</strong> 
-        <span class="speed-badge speed-normal">🔄 NORMAL</span>
-        </div>
-        """, unsafe_allow_html=True)
-        st.markdown("**Upload your resume as PDF:**")
         pdf_file = st.file_uploader(
-            "Choose a PDF file",
+            "Upload PDF",
             type=['pdf'],
-            help="Upload your resume in PDF format",
             key="pdf_uploader"
         )
         if pdf_file is not None:
-            with st.spinner("📄 Processing PDF..."):
+            with st.spinner("Processing PDF..."):
                 extracted_text = extract_text_from_pdf(pdf_file)
-            if extracted_text and extracted_text.strip():
-                st.session_state.resume_text = extracted_text.strip()
-                st.success(f"✅ PDF processed successfully! Extracted {len(extracted_text)} characters.")
+            if extracted_text:
+                st.session_state.resume_text = extracted_text
+                st.success("PDF processed!")
             else:
-                st.error("❌ Could not extract text from PDF")
+                st.error("Could not extract text from PDF.")
     with tab3:
-        st.markdown("""
-        <div class="processing-indicator">
-        🖼️ <strong>Image Upload</strong> 
-        <span class="speed-badge speed-slow">🐌 SLOW</span>
-        </div>
-        """, unsafe_allow_html=True)
         if not EASYOCR_AVAILABLE:
-            st.warning("⚠️ Image processing not available. Please use Text Input or PDF upload.")
-        else:
-            st.info("💡 Image processing uses AI OCR and may take 10-30 seconds")
-        st.markdown("**Upload your resume as image:**")
+            st.info("Image processing not available. Please use Text or PDF upload.")
         image_file = st.file_uploader(
-            "Choose an image file",
+            "Upload Image",
             type=['png', 'jpg', 'jpeg'],
-            help="Upload your resume as an image (PNG, JPG, JPEG)",
             key="image_uploader"
         )
-        if image_file is not None:
-            st.image(image_file, caption="Your Resume", use_container_width=True)
-            if EASYOCR_AVAILABLE:
-                with st.spinner("🔍 Reading your resume with AI OCR..."):
-                    extracted_text = extract_text_from_image(image_file)
-                if extracted_text and extracted_text.strip():
-                    st.session_state.resume_text = extracted_text.strip()
-                    st.success(f"✅ Image processed successfully! Extracted {len(extracted_text)} characters.")
-                else:
-                    st.error("❌ Could not extract text from image")
-                    st.info("💡 Try using a clearer image or switch to Text Input/PDF upload")
-    if st.session_state.resume_text and st.session_state.resume_text.strip():
-        col1, col2 = st.columns([4, 1])
-        with col1:
-            st.markdown("### 📖 Resume Preview")
-        with col2:
-            if st.button("🗑️ Clear Resume", key="clear_resume", help="Clear the current resume and start over"):
-                st.session_state.resume_text = ""
-                st.session_state.roast_type = None
-                st.rerun()
-        with st.expander("📖 View Full Resume Content", expanded=False):
-            st.text_area("Resume Content", st.session_state.resume_text, height=200, disabled=True)
-        st.info(f"📊 Resume loaded: {len(st.session_state.resume_text)} characters, {len(st.session_state.resume_text.split())} words")
-        st.markdown("---")
-        st.markdown('<div class="brutality-section">', unsafe_allow_html=True)
-        st.markdown("### 🔥 Choose Your Level of Brutality 💀")
-        st.markdown("Select how you want your resume to be destroyed:")
+        if image_file is not None and EASYOCR_AVAILABLE:
+            st.image(image_file, caption="Your Resume", use_column_width=True)
+            with st.spinner("Reading your resume with AI OCR..."):
+                extracted_text = extract_text_from_image(image_file)
+            if extracted_text:
+                st.session_state.resume_text = extracted_text
+                st.success("Image processed!")
+            else:
+                st.error("Could not extract text from image.")
+    # --- Resume Preview ---
+    resume_text = st.session_state.get('resume_text', '')
+    if resume_text:
+        st.divider()
+        st.subheader('Resume Preview')
+        st.text_area("Resume Content", resume_text, height=150, disabled=True, key="preview_area")
+        st.info(f"Loaded: {len(resume_text)} characters, {len(resume_text.split())} words")
+        st.divider()
+        st.subheader('Choose Your Level of Brutality')
         col1, col2 = st.columns(2)
         with col1:
-            if st.button(
-                "💀 DEVASTATINGLY BRUTAL 💀",
-                key="devastatingly_brutal",
-                help="Prepare for complete annihilation. No mercy, no survivors.",
-                use_container_width=True
-            ):
+            if st.button("Devastatingly Brutal", key="devastatingly_brutal"):
                 st.session_state.roast_type = "devastatingly_brutal"
-                st.rerun()
         with col2:
-            if st.button(
-                "😭 SOUL CRUSHING 😭",
-                key="soul_crushing", 
-                help="Will make you cry and question everything. Emotional devastation guaranteed.",
-                use_container_width=True
-            ):
+            if st.button("Soul Crushing", key="soul_crushing"):
                 st.session_state.roast_type = "soul_crushing"
-                st.rerun()
-        if st.session_state.roast_type == "devastatingly_brutal":
-            st.success("💀 **DEVASTATINGLY BRUTAL SELECTED** 💀\n⚡ Prepare for complete annihilation ⚡\n🔥 No mercy, no survivors 🔥")
-        elif st.session_state.roast_type == "soul_crushing":
-            st.success("😭 **SOUL CRUSHING SELECTED** 😭\n💔 Will make you cry and question everything 💔\n🌪️ Emotional devastation guaranteed 🌪️")
-        st.warning("⚠️ WARNING: This will be EXTREMELY brutal! This is for entertainment only. Don't take it seriously! ⚠️")
-        st.markdown('</div>', unsafe_allow_html=True)
-        if st.session_state.roast_type:
-            st.markdown("---")
-            if st.button("🔥 DESTROY MY RESUME NOW! ⚡💀", key="destroy_button", use_container_width=True):
-                with st.spinner("🔥 Preparing your complete destruction... 💀"):
-                    roast_result = generate_roast(client, st.session_state.resume_text, st.session_state.roast_type)
-                    if roast_result:
-                        st.markdown('<div class="roast-container">', unsafe_allow_html=True)
-                        if st.session_state.roast_type == "devastatingly_brutal":
-                            st.markdown("### 💀⚡ YOUR RESUME HAS BEEN DEVASTATINGLY DESTROYED ⚡💀")
-                        else:
-                            st.markdown("### 😭💔 YOUR RESUME HAS BEEN SOUL-CRUSHINGLY ANNIHILATED 💔😭")
-                        st.markdown("---")
-                        st.markdown(roast_result)
-                        st.markdown('</div>', unsafe_allow_html=True)
-                        st.markdown("---")
-                        if st.button("🔄 DESTROY ANOTHER RESUME", key="reset_btn", use_container_width=True):
-                            st.session_state.roast_type = None
-                            st.rerun()
-                    else:
-                        st.error("💥 Destruction failed! Try again.")
-        else:
-            st.info("👆 Select your preferred level of brutality above to proceed with the destruction!")
+        roast_type = st.session_state.get('roast_type', None)
+        if roast_type:
+            if st.button("🔥 Destroy My Resume!", key="destroy_button"):
+                with st.spinner("Preparing your destruction..."):
+                    roast_result = generate_roast(client, resume_text, roast_type)
+                if roast_result:
+                    st.divider()
+                    st.subheader('Roast Result')
+                    st.write(roast_result)
+                    if st.button("Destroy Another Resume", key="reset_btn"):
+                        st.session_state.resume_text = ''
+                        st.session_state.roast_type = None
+                        st.rerun()
+                else:
+                    st.error("Destruction failed! Try again.")
     else:
-        st.info("👆 Upload your resume using one of the methods above to begin the destruction!")
-    st.markdown("---")
-    st.markdown("### 💀 DISCLAIMER ⚠️")
-    st.markdown("This is purely for **ENTERTAINMENT PURPOSES** 🎭. The feedback is intentionally harsh and should not be taken seriously. Use this for fun, not as actual career advice! 😈")
-    st.markdown("---")
-    st.markdown("Made with 🔥💀 by **Resume Destroyer** | Powered by ⚡ **Groq AI** | *No resumes were harmed in the making of this app... just kidding, they were obliterated* 😂")
+        st.info("Upload your resume using one of the methods above to begin.")
+    st.divider()
+    st.caption("This is for entertainment only. The feedback is intentionally harsh and should not be taken seriously.")
+    st.caption("Made by Resume Destroyer | Powered by Groq AI")
 
 if __name__ == "__main__":
     main()
