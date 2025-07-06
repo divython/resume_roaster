@@ -25,24 +25,26 @@ def inject_theme_css(theme):
     if theme == 'dark':
         st.markdown('''<style>
             body, .stApp { background: #18181b !important; color: #e0e0e0 !important; }
-            .stButton > button { background: #22223b; color: #fff; border-radius: 8px; font-weight: 700; border: none; padding: 0.75rem 2rem; margin: 0.5rem 0; }
+            .stButton > button { background: #22223b; color: #fff; border-radius: 32px; font-weight: 900; border: none; padding: 1.1rem 2.5rem; margin: 0.5rem 0; font-size: 1.1rem; box-shadow: 0 2px 12px #2a003f44; transition: 0.2s; }
+            .stButton > button.selected { background: linear-gradient(90deg, #ff1744 60%, #6a0572 100%) !important; color: #fff !important; box-shadow: 0 0 16px #ff1744cc, 0 0 32px #6a0572cc; }
             .stButton > button:hover { background: #3a3a5a; color: #fff; }
-            .stTextArea textarea, .stFileUploader, .stTextInput input { background: #232336 !important; color: #e0e0e0 !important; border-radius: 8px !important; border: 1px solid #333 !important; }
-            .stTextArea textarea:focus, .stTextInput input:focus { border: 1.5px solid #6366f1 !important; }
-            .stAlert, .stInfo, .stSuccess, .stError, .stWarning { border-radius: 8px !important; }
-            .stTabs [data-baseweb="tab"] { background: #232336 !important; color: #e0e0e0 !important; border-radius: 8px 8px 0 0 !important; }
-            .stTabs [aria-selected="true"] { background: #6366f1 !important; color: #fff !important; }
+            .stTextArea textarea, .stFileUploader, .stTextInput input { background: #232336 !important; color: #e0e0e0 !important; border-radius: 16px !important; border: 1.5px solid #333 !important; }
+            .stTextArea textarea:focus, .stTextInput input:focus { border: 2px solid #ff1744 !important; }
+            .stAlert, .stInfo, .stSuccess, .stError, .stWarning { border-radius: 12px !important; }
+            .stTabs [data-baseweb="tab"] { background: #232336 !important; color: #e0e0e0 !important; border-radius: 12px 12px 0 0 !important; }
+            .stTabs [aria-selected="true"] { background: linear-gradient(90deg, #ff1744 60%, #6a0572 100%) !important; color: #fff !important; }
         </style>''', unsafe_allow_html=True)
     else:
         st.markdown('''<style>
             body, .stApp { background: #f7f7fa !important; color: #22223b !important; }
-            .stButton > button { background: #e0e0e0; color: #22223b; border-radius: 8px; font-weight: 700; border: none; padding: 0.75rem 2rem; margin: 0.5rem 0; }
+            .stButton > button { background: #e0e0e0; color: #22223b; border-radius: 32px; font-weight: 900; border: none; padding: 1.1rem 2.5rem; margin: 0.5rem 0; font-size: 1.1rem; box-shadow: 0 2px 12px #bbb4; transition: 0.2s; }
+            .stButton > button.selected { background: linear-gradient(90deg, #ff1744 60%, #6a0572 100%) !important; color: #fff !important; box-shadow: 0 0 16px #ff1744cc, 0 0 32px #6a0572cc; }
             .stButton > button:hover { background: #6366f1; color: #fff; }
-            .stTextArea textarea, .stFileUploader, .stTextInput input { background: #fff !important; color: #22223b !important; border-radius: 8px !important; border: 1px solid #bbb !important; }
-            .stTextArea textarea:focus, .stTextInput input:focus { border: 1.5px solid #6366f1 !important; }
-            .stAlert, .stInfo, .stSuccess, .stError, .stWarning { border-radius: 8px !important; }
-            .stTabs [data-baseweb="tab"] { background: #e0e0e0 !important; color: #22223b !important; border-radius: 8px 8px 0 0 !important; }
-            .stTabs [aria-selected="true"] { background: #6366f1 !important; color: #fff !important; }
+            .stTextArea textarea, .stFileUploader, .stTextInput input { background: #fff !important; color: #22223b !important; border-radius: 16px !important; border: 1.5px solid #bbb !important; }
+            .stTextArea textarea:focus, .stTextInput input:focus { border: 2px solid #ff1744 !important; }
+            .stAlert, .stInfo, .stSuccess, .stError, .stWarning { border-radius: 12px !important; }
+            .stTabs [data-baseweb="tab"] { background: #e0e0e0 !important; color: #22223b !important; border-radius: 12px 12px 0 0 !important; }
+            .stTabs [aria-selected="true"] { background: linear-gradient(90deg, #ff1744 60%, #6a0572 100%) !important; color: #fff !important; }
         </style>''', unsafe_allow_html=True)
 
 # Page config
@@ -162,10 +164,26 @@ def generate_roast(client, resume_text, roast_type):
         st.error(f"Error generating roast: {str(e)}")
         return ""
 
+def reddit_comment_box(text, username="u/ResumeDestroyer", upvotes=None, timeago="just now"):
+    import random
+    if upvotes is None:
+        upvotes = random.randint(1, 9999)
+    return f'''
+    <div style="background:#232336;border-radius:12px;padding:1.2rem 1.5rem;margin:1.5rem 0;box-shadow:0 2px 16px #6a057244;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:0.5rem;">
+        <span style="font-size:1.5rem;user-select:none;">⬆️</span>
+        <span style="font-size:1.1rem;font-weight:700;color:#ff1744;">{upvotes}</span>
+        <span style="font-size:1.5rem;user-select:none;">⬇️</span>
+        <span style="margin-left:18px;font-size:1rem;color:#aaa;">{username} <span style='color:#888;font-size:0.95rem;'>· {timeago}</span></span>
+      </div>
+      <div style="font-size:1.13rem;line-height:1.7;font-family:'Inter',sans-serif;color:#e0e0e0;white-space:pre-wrap;">{text}</div>
+    </div>
+    '''
+
 def main():
     theme = set_theme()
     inject_theme_css(theme)
-    st.title('🔥 Resume Destroyer')
+    st.markdown('<div class="main-header" style="color:#ff1744;text-shadow:0 0 24px #6a0572;">🔥 Resume Destroyer</div>', unsafe_allow_html=True)
     st.caption('Upload your resume and prepare for total annihilation!')
     client = get_groq_client()
     st.divider()
@@ -220,7 +238,6 @@ def main():
         st.info(f"Loaded: {len(resume_text)} characters, {len(resume_text.split())} words")
         st.divider()
         st.subheader('Choose Your Level of Brutality')
-        # --- Brutality Buttons ---
         selected = st.session_state.get('roast_type', None)
         c1, c2 = st.columns([1,1])
         with c1:
@@ -229,12 +246,14 @@ def main():
         with c2:
             if st.button("😭 Soul Crushing", key="soul_crushing_btn"):
                 st.session_state.roast_type = "soul_crushing"
-        # Highlight selected
-        selected = st.session_state.get('roast_type', None)
-        if selected == "devastatingly_brutal":
-            st.markdown('<div style="margin-top:10px;padding:10px 0 0 0;"><span style="background:#ff1744;color:#fff;padding:8px 18px;border-radius:20px;font-weight:700;">💀 DEVASTATINGLY BRUTAL SELECTED</span></div>', unsafe_allow_html=True)
-        elif selected == "soul_crushing":
-            st.markdown('<div style="margin-top:10px;padding:10px 0 0 0;"><span style="background:#673ab7;color:#fff;padding:8px 18px;border-radius:20px;font-weight:700;">😭 SOUL CRUSHING SELECTED</span></div>', unsafe_allow_html=True)
+        # Highlight selected by adding 'selected' class to the button
+        st.markdown('''<script>
+        let btns = window.parent.document.querySelectorAll('button[data-testid^="baseButton"]');
+        btns.forEach(btn => { btn.classList.remove('selected'); });
+        let selected = '%s';
+        if(selected === 'devastatingly_brutal') btns[0].classList.add('selected');
+        if(selected === 'soul_crushing') btns[1].classList.add('selected');
+        </script>''' % (selected if selected else ''), unsafe_allow_html=True)
         # --- Destroy Button ---
         if selected:
             st.markdown('<div style="margin:32px 0 16px 0;text-align:center;">', unsafe_allow_html=True)
@@ -242,11 +261,15 @@ def main():
             st.markdown('</div>', unsafe_allow_html=True)
             if destroy:
                 with st.spinner("Preparing your destruction..."):
-                    roast_result = generate_roast(client, resume_text, selected)
+                    try:
+                        roast_result = generate_roast(client, resume_text, selected)
+                    except Exception as e:
+                        st.error("😈 API call limit reached! Even the devil needs a break. Try again later or offer a sacrifice to the cloud gods.")
+                        return
                 if roast_result:
                     st.divider()
-                    st.subheader('Roast Result')
-                    st.write(roast_result)
+                    st.subheader('Reddit Roast Result')
+                    st.markdown(reddit_comment_box(roast_result), unsafe_allow_html=True)
                     if st.button("Destroy Another Resume", key="reset_btn"):
                         st.session_state.resume_text = ''
                         st.session_state.roast_type = None
