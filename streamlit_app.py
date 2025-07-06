@@ -269,22 +269,22 @@ def main():
         # Custom highlight for selected button (escape curly braces for .format)
         css = """
         <style>
-        button[data-testid="baseButton-devastatingly_brutal_btn"] {
+        button[data-testid="baseButton-devastatingly_brutal_btn"] {{
             background: {bg1} !important;
             color: #fff !important;
             border-radius: 32px !important;
             font-weight: 900 !important;
             font-size: 1.1rem !important;
             box-shadow: {shadow1};
-        }
-        button[data-testid="baseButton-soul_crushing_btn"] {
+        }}
+        button[data-testid="baseButton-soul_crushing_btn"] {{
             background: {bg2} !important;
             color: #fff !important;
             border-radius: 32px !important;
             font-weight: 900 !important;
             font-size: 1.1rem !important;
             box-shadow: {shadow2};
-        }
+        }}
         </style>
         """.format(
             bg1='linear-gradient(90deg, #ff1744 60%, #6a0572 100%)' if selected=='devastatingly_brutal' else '#22223b',
