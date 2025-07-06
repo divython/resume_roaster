@@ -364,8 +364,9 @@ def main():
     else:
         st.info("Upload your resume using one of the methods above to begin.")
     st.divider()
-    st.caption("This is for entertainment only. The feedback is intentionally harsh and should not be taken seriously.")
-    st.caption("Made by Resume Destroyer | Powered by Groq AI")
+    st.caption("⚠️ **DISCLAIMER:** This is pure entertainment! The feedback is intentionally harsh and savage - don't take it seriously. Your resume probably isn't that bad... or is it? 😈")
+    st.caption("🔥 **Made by:** Divython | **Powered by:** Groq AI, Gemini CLI & GitHub Copilot")
+    st.caption("💀 **Warning:** Side effects may include existential crisis, career doubts, and uncontrollable laughter.")
 
 if __name__ == "__main__":
     main()
