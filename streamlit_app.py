@@ -220,18 +220,29 @@ def main():
         st.info(f"Loaded: {len(resume_text)} characters, {len(resume_text.split())} words")
         st.divider()
         st.subheader('Choose Your Level of Brutality')
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("Devastatingly Brutal", key="devastatingly_brutal"):
+        # --- Brutality Buttons ---
+        selected = st.session_state.get('roast_type', None)
+        c1, c2 = st.columns([1,1])
+        with c1:
+            if st.button("💀 Devastatingly Brutal", key="devastatingly_brutal_btn"):
                 st.session_state.roast_type = "devastatingly_brutal"
-        with col2:
-            if st.button("Soul Crushing", key="soul_crushing"):
+        with c2:
+            if st.button("😭 Soul Crushing", key="soul_crushing_btn"):
                 st.session_state.roast_type = "soul_crushing"
-        roast_type = st.session_state.get('roast_type', None)
-        if roast_type:
-            if st.button("🔥 Destroy My Resume!", key="destroy_button"):
+        # Highlight selected
+        selected = st.session_state.get('roast_type', None)
+        if selected == "devastatingly_brutal":
+            st.markdown('<div style="margin-top:10px;padding:10px 0 0 0;"><span style="background:#ff1744;color:#fff;padding:8px 18px;border-radius:20px;font-weight:700;">💀 DEVASTATINGLY BRUTAL SELECTED</span></div>', unsafe_allow_html=True)
+        elif selected == "soul_crushing":
+            st.markdown('<div style="margin-top:10px;padding:10px 0 0 0;"><span style="background:#673ab7;color:#fff;padding:8px 18px;border-radius:20px;font-weight:700;">😭 SOUL CRUSHING SELECTED</span></div>', unsafe_allow_html=True)
+        # --- Destroy Button ---
+        if selected:
+            st.markdown('<div style="margin:32px 0 16px 0;text-align:center;">', unsafe_allow_html=True)
+            destroy = st.button("🔥 DESTROY MY RESUME! ⚡💀", key="destroy_button", use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+            if destroy:
                 with st.spinner("Preparing your destruction..."):
-                    roast_result = generate_roast(client, resume_text, roast_type)
+                    roast_result = generate_roast(client, resume_text, selected)
                 if roast_result:
                     st.divider()
                     st.subheader('Roast Result')
