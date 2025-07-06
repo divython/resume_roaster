@@ -299,7 +299,7 @@ def main():
                 try:
                     # Prompt Groq to return 3+ comments with nested replies in Reddit style
                     prompt = f"""
-You are a devilish, witty, and savage Redditor. Roast the following resume in a Reddit comment section style. Generate at least 3 top-level comments, each with at least one nested reply. Each comment should be brutal, funny, and formatted as a Reddit comment (no markdown, just plain text). Use different usernames and upvote counts. Return the result as a Python list of dicts: [{{'text':..., 'username':..., 'upvotes':..., 'timeago':..., 'replies':[...]}}].
+You are a devilish, witty, and savage Redditor. Roast the following resume in a Reddit comment section style. Generate at least 3 top-level comments, each with at least one nested reply. Each comment should be brutal, funny, and formatted as a Reddit comment (no markdown, just plain text). Use different usernames and upvote counts. Return the result as a Python list of dicts: [{{'main_comment':..., 'username':..., 'upvotes':..., 'timeago':..., 'replies':[...]}}].
 
 Resume: {resume_text}
 """
@@ -319,7 +319,7 @@ Resume: {resume_text}
                         comments = ast.literal_eval(response.choices[0].message.content)
                     except Exception:
                         # fallback: show as a single comment
-                        comments = [{"text": response.choices[0].message.content, "username": "u/ResumeDestroyer", "upvotes": None, "timeago": "just now", "replies": []}]
+                        comments = [{"main_comment": response.choices[0].message.content, "username": "u/ResumeDestroyer", "upvotes": None, "timeago": "just now", "replies": []}]
                 except Exception as e:
                     st.error("😈 API call limit reached! Even the devil needs a break. Try again later or offer a sacrifice to the cloud gods.")
                     return
