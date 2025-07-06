@@ -54,8 +54,8 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed",
     menu_items={
-        'Get Help': 'https://github.com/divython/resume_roaster_app',
-        'Report a bug': "https://github.com/divython/resume_roaster_app/issues",
+        'Get Help': 'https://github.com/divython/resume_roaster',
+        'Report a bug': "https://github.com/divython/resume_roaster/issues",
         'About': "# Resume Destroyer 🔥\nUpload your resume and prepare for total annihilation!"
     }
 )
