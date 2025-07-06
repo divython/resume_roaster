@@ -297,29 +297,63 @@ def main():
         if brutal_btn or soul_btn:
             with st.spinner("Summoning the Reddit demons..."):
                 try:
-                    # Prompt Groq to return 3+ comments with nested replies in Reddit style
-                    prompt = f"""
-You are a devilish, witty, and savage Redditor. Roast the following resume in a Reddit comment section style. Generate at least 3 top-level comments, each with at least one nested reply. Each comment should be brutal, funny, and formatted as a Reddit comment (no markdown, just plain text). Use different usernames and upvote counts. Return the result as a Python list of dicts: [{{'main_comment':..., 'username':..., 'upvotes':..., 'timeago':..., 'replies':[...]}}].
-
-Resume: {resume_text}
-"""
-                    import ast
-                    response = client.chat.completions.create(
-                        messages=[
-                            {"role": "system", "content": "You are a devilish, witty, and savage Redditor."},
-                            {"role": "user", "content": prompt}
-                        ],
-                        model="llama3-8b-8192",
-                        temperature=0.9,
-                        max_tokens=1800,
-                    )
-                    # Try to parse the response as a list of dicts
-                    comments = []
-                    try:
-                        comments = ast.literal_eval(response.choices[0].message.content)
-                    except Exception:
-                        # fallback: show as a single comment
-                        comments = [{"main_comment": response.choices[0].message.content, "username": "u/ResumeDestroyer", "upvotes": None, "timeago": "just now", "replies": []}]
+                    # Simplified approach: Generate a brutal roast and format it as Reddit comments
+                    roast_text = generate_roast(client, resume_text, st.session_state.roast_type)
+                    
+                    # Create fake Reddit comments with the roast
+                    import random
+                    usernames = ["u/ResumeDestroyer", "u/HRNightmare", "u/CareerKiller", "u/TalentlessTracker", "u/SkilllessScout"]
+                    
+                    # Split roast into multiple comments
+                    sentences = roast_text.split('. ')
+                    main_comment = '. '.join(sentences[:3]) + '.' if len(sentences) > 3 else roast_text
+                    
+                    comments = [
+                        {
+                            "main_comment": main_comment,
+                            "username": random.choice(usernames),
+                            "upvotes": random.randint(500, 5000),
+                            "timeago": "2 hours ago",
+                            "replies": [
+                                {
+                                    "main_comment": "Holy shit, this is absolutely savage! 💀",
+                                    "username": random.choice(usernames),
+                                    "upvotes": random.randint(100, 1000),
+                                    "timeago": "1 hour ago",
+                                    "replies": []
+                                }
+                            ]
+                        }
+                    ]
+                    
+                    # Add more comments if we have more sentences
+                    if len(sentences) > 3:
+                        remaining_text = '. '.join(sentences[3:])
+                        comments.append({
+                            "main_comment": remaining_text,
+                            "username": random.choice(usernames),
+                            "upvotes": random.randint(200, 2000),
+                            "timeago": "3 hours ago",
+                            "replies": [
+                                {
+                                    "main_comment": "This person's career is absolutely DONE. RIP. 🪦",
+                                    "username": random.choice(usernames),
+                                    "upvotes": random.randint(50, 500),
+                                    "timeago": "2 hours ago",
+                                    "replies": []
+                                }
+                            ]
+                        })
+                    
+                    # Add a final brutal comment
+                    comments.append({
+                        "main_comment": "I've seen some bad resumes, but this... this is a whole new level of catastrophic failure. Someone needs to do humanity a favor and burn this thing.",
+                        "username": random.choice(usernames),
+                        "upvotes": random.randint(1000, 8000),
+                        "timeago": "4 hours ago",
+                        "replies": []
+                    })
+                    
                 except Exception as e:
                     st.error("😈 API call limit reached! Even the devil needs a break. Try again later or offer a sacrifice to the cloud gods.")
                     return
