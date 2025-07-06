@@ -164,11 +164,11 @@ def generate_roast(client, resume_text, roast_type):
         st.error(f"Error generating roast: {str(e)}")
         return ""
 
-def reddit_comment_box(text, username="u/ResumeDestroyer", upvotes=None, timeago="just now"):
+def reddit_comment_thread(main_comment, replies=None, username="u/ResumeDestroyer", upvotes=None, timeago="just now"):
     import random
     if upvotes is None:
         upvotes = random.randint(1, 9999)
-    return f'''
+    thread = f'''
     <div style="background:#232336;border-radius:12px;padding:1.2rem 1.5rem;margin:1.5rem 0;box-shadow:0 2px 16px #6a057244;">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:0.5rem;">
         <span style="font-size:1.5rem;user-select:none;">⬆️</span>
@@ -176,9 +176,15 @@ def reddit_comment_box(text, username="u/ResumeDestroyer", upvotes=None, timeago
         <span style="font-size:1.5rem;user-select:none;">⬇️</span>
         <span style="margin-left:18px;font-size:1rem;color:#aaa;">{username} <span style='color:#888;font-size:0.95rem;'>· {timeago}</span></span>
       </div>
-      <div style="font-size:1.13rem;line-height:1.7;font-family:'Inter',sans-serif;color:#e0e0e0;white-space:pre-wrap;">{text}</div>
-    </div>
+      <div style="font-size:1.13rem;line-height:1.7;font-family:'Inter',sans-serif;color:#e0e0e0;white-space:pre-wrap;">{main_comment}</div>
     '''
+    if replies:
+        thread += '<div style="margin-left:2.5rem;margin-top:1.2rem;">'
+        for reply in replies:
+            thread += reddit_comment_thread(**reply)
+        thread += '</div>'
+    thread += '</div>'
+    return thread
 
 def main():
     theme = set_theme()
@@ -237,45 +243,90 @@ def main():
         st.text_area("Resume Content", resume_text, height=150, disabled=True, key="preview_area")
         st.info(f"Loaded: {len(resume_text)} characters, {len(resume_text.split())} words")
         st.divider()
-        st.subheader('Choose Your Level of Brutality')
+        st.markdown('<h3 style="color:#ff1744;text-align:center;margin-bottom:0.5em;">Destroy your resume by choosing brutality level</h3>', unsafe_allow_html=True)
         selected = st.session_state.get('roast_type', None)
         c1, c2 = st.columns([1,1])
         with c1:
-            if st.button("💀 Devastatingly Brutal", key="devastatingly_brutal_btn"):
-                st.session_state.roast_type = "devastatingly_brutal"
+            brutal_btn = st.button(
+                "💀 Devastatingly Brutal",
+                key="devastatingly_brutal_btn",
+                help="No mercy. Pure annihilation.",
+                use_container_width=True
+            )
         with c2:
-            if st.button("😭 Soul Crushing", key="soul_crushing_btn"):
-                st.session_state.roast_type = "soul_crushing"
-        # Highlight selected by adding 'selected' class to the button
-        st.markdown('''<script>
-        let btns = window.parent.document.querySelectorAll('button[data-testid^="baseButton"]');
-        btns.forEach(btn => { btn.classList.remove('selected'); });
-        let selected = '%s';
-        if(selected === 'devastatingly_brutal') btns[0].classList.add('selected');
-        if(selected === 'soul_crushing') btns[1].classList.add('selected');
-        </script>''' % (selected if selected else ''), unsafe_allow_html=True)
-        # --- Destroy Button ---
-        if selected:
-            st.markdown('<div style="margin:32px 0 16px 0;text-align:center;">', unsafe_allow_html=True)
-            destroy = st.button("🔥 DESTROY MY RESUME! ⚡💀", key="destroy_button", use_container_width=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-            if destroy:
-                with st.spinner("Preparing your destruction..."):
+            soul_btn = st.button(
+                "😭 Soul Crushing",
+                key="soul_crushing_btn",
+                help="Will make you cry and question everything.",
+                use_container_width=True
+            )
+        # Highlight selected by re-rendering buttons with different style
+        if brutal_btn:
+            st.session_state.roast_type = "devastatingly_brutal"
+        if soul_btn:
+            st.session_state.roast_type = "soul_crushing"
+        selected = st.session_state.get('roast_type', None)
+        # Custom highlight for selected button (proper curly braces for .format)
+        css = """
+        <style>
+        button[data-testid="baseButton-devastatingly_brutal_btn"] {
+            background: {bg1} !important;
+            color: #fff !important;
+            border-radius: 32px !important;
+            font-weight: 900 !important;
+            font-size: 1.1rem !important;
+            box-shadow: {shadow1};
+        }
+        button[data-testid="baseButton-soul_crushing_btn"] {
+            background: {bg2} !important;
+            color: #fff !important;
+            border-radius: 32px !important;
+            font-weight: 900 !important;
+            font-size: 1.1rem !important;
+            box-shadow: {shadow2};
+        }
+        </style>
+        """.format(
+            bg1='linear-gradient(90deg, #ff1744 60%, #6a0572 100%)' if selected=='devastatingly_brutal' else '#22223b',
+            shadow1='0 0 16px #ff1744cc, 0 0 32px #6a0572cc' if selected=='devastatingly_brutal' else '0 2px 12px #2a003f44',
+            bg2='linear-gradient(90deg, #6a0572 60%, #ff1744 100%)' if selected=='soul_crushing' else '#22223b',
+            shadow2='0 0 16px #6a0572cc, 0 0 32px #ff1744cc' if selected=='soul_crushing' else '0 2px 12px #2a003f44',
+        )
+        st.markdown(css, unsafe_allow_html=True)
+        # --- Roast on button click ---
+        if brutal_btn or soul_btn:
+            with st.spinner("Summoning the Reddit demons..."):
+                try:
+                    # Prompt Groq to return 3+ comments with nested replies in Reddit style
+                    prompt = f"""
+You are a devilish, witty, and savage Redditor. Roast the following resume in a Reddit comment section style. Generate at least 3 top-level comments, each with at least one nested reply. Each comment should be brutal, funny, and formatted as a Reddit comment (no markdown, just plain text). Use different usernames and upvote counts. Return the result as a Python list of dicts: [{{'text':..., 'username':..., 'upvotes':..., 'timeago':..., 'replies':[...]}}].
+
+Resume: {resume_text}
+"""
+                    import ast
+                    response = client.chat.completions.create(
+                        messages=[
+                            {"role": "system", "content": "You are a devilish, witty, and savage Redditor."},
+                            {"role": "user", "content": prompt}
+                        ],
+                        model="llama3-8b-8192",
+                        temperature=0.9,
+                        max_tokens=1800,
+                    )
+                    # Try to parse the response as a list of dicts
+                    comments = []
                     try:
-                        roast_result = generate_roast(client, resume_text, selected)
-                    except Exception as e:
-                        st.error("😈 API call limit reached! Even the devil needs a break. Try again later or offer a sacrifice to the cloud gods.")
-                        return
-                if roast_result:
-                    st.divider()
-                    st.subheader('Reddit Roast Result')
-                    st.markdown(reddit_comment_box(roast_result), unsafe_allow_html=True)
-                    if st.button("Destroy Another Resume", key="reset_btn"):
-                        st.session_state.resume_text = ''
-                        st.session_state.roast_type = None
-                        st.rerun()
-                else:
-                    st.error("Destruction failed! Try again.")
+                        comments = ast.literal_eval(response.choices[0].message.content)
+                    except Exception:
+                        # fallback: show as a single comment
+                        comments = [{"text": response.choices[0].message.content, "username": "u/ResumeDestroyer", "upvotes": None, "timeago": "just now", "replies": []}]
+                except Exception as e:
+                    st.error("😈 API call limit reached! Even the devil needs a break. Try again later or offer a sacrifice to the cloud gods.")
+                    return
+            st.divider()
+            st.subheader('Reddit Roast Result')
+            for c in comments:
+                st.markdown(reddit_comment_thread(**c), unsafe_allow_html=True)
     else:
         st.info("Upload your resume using one of the methods above to begin.")
     st.divider()
