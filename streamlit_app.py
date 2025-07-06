@@ -266,7 +266,7 @@ def main():
         if soul_btn:
             st.session_state.roast_type = "soul_crushing"
         selected = st.session_state.get('roast_type', None)
-        # Custom highlight for selected button (proper curly braces for .format)
+        # Custom highlight for selected button (escape curly braces for .format)
         css = """
         <style>
         button[data-testid="baseButton-devastatingly_brutal_btn"] {
