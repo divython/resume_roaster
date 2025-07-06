@@ -239,9 +239,7 @@ def main():
     resume_text = st.session_state.get('resume_text', '')
     if resume_text:
         st.divider()
-        st.subheader('Resume Preview')
-        st.text_area("Resume Content", resume_text, height=150, disabled=True, key="preview_area")
-        st.info(f"Loaded: {len(resume_text)} characters, {len(resume_text.split())} words")
+        st.info(f"📝 Resume loaded: {len(resume_text)} characters, {len(resume_text.split())} words")
         st.divider()
         st.markdown('<h3 style="color:#ff1744;text-align:center;margin-bottom:0.5em;">Destroy your resume by choosing brutality level</h3>', unsafe_allow_html=True)
         selected = st.session_state.get('roast_type', None)
